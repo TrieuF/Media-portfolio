@@ -44,9 +44,7 @@ export default defineConfig({
   ],
 
   schema: {
-    types: schemaTypes,
-    // Prevents Singletons from showing up in the global "Create New (+)" options menu
-    templates: (prev) => prev.filter((template) => !singletonTypes.has(template.id)),
+    types: schemaTypes
   },
 
   document: {

@@ -19,10 +19,15 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
 
     if (!videoItem) return <div>No video found for this project.</div>;
 
-    const togglePlay = () => {
+    const togglePlay = async () => {
         if (videoRef.current?.paused) {
-            videoRef.current.play();
-            setIsPlaying(true);
+            try {
+                await videoRef.current.play();
+                setIsPlaying(true);
+            } catch (error) {
+                console.error("Playback failed:", error);
+                setIsPlaying(false);
+            }
         } else {
             videoRef.current?.pause();
             setIsPlaying(false);
@@ -74,7 +79,7 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                 />
 
                 {/* Controls - Absolute positioned at the bottom */}
-                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[450px] p-4 bg-black/50 backdrop-blur-md rounded-full z-20">
+                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-112.5 p-4 bg-black/50 backdrop-blur-md rounded-full z-20">
                     <input
                         type="range"
                         min="0"

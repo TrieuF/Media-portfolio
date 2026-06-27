@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ProjectDocument } from "@/types";
@@ -25,7 +25,12 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
         videoRefs.current[index] = el;
     }, []);
 
-    const handleProjectClick = (e: React.MouseEvent, path: string, index: number) => {
+    // 1. FIXED: Explicitly typed Event to avoid UMD global lookup
+    const handleProjectClick = (
+        e: React.MouseEvent<HTMLAnchorElement>,
+        path: string,
+        index: number
+    ) => {
         if (hasMoved.current) {
             e.preventDefault();
             return;
@@ -38,42 +43,50 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
         }, 800);
     };
 
-    // 1. MANUAL VIDEO PLAYBACK CONTROL (Robust Last 5s loop)
+    // 2. FIXED: Robust Video Playback with AbortError handling
     useEffect(() => {
         const video = videoRefs.current[activeIndex];
         if (!video) return;
 
-        const playLastFiveSeconds = () => {
-            // Check if duration is a valid number before using it
+        // 1. Define the function as a constant so the reference remains stable
+        const playLastFiveSeconds = async () => {
             if (!Number.isFinite(video.duration)) return;
+            video.currentTime = Math.max(0, video.duration - 5);
 
-            const startTime = Math.max(0, video.duration - 5);
-            video.currentTime = startTime;
-            video.play().catch(() => {});
+            try {
+                await video.play();
+            } catch (err) {
+                if (err instanceof Error && err.name !== 'AbortError') {
+                    console.error("Playback failed:", err);
+                }
+            }
+        };
+
+        // 2. Define a wrapper that explicitly catches the promise
+        const handleMetadata = () => {
+            playLastFiveSeconds().catch(console.error);
         };
 
         const handleTimeUpdate = () => {
             if (Number.isFinite(video.duration) && video.currentTime >= video.duration - 0.1) {
-                playLastFiveSeconds();
+                playLastFiveSeconds().catch(console.error);
             }
         };
 
-        // If metadata is already loaded, start playing immediately
-        if (video.readyState >= 1) {
-            playLastFiveSeconds();
-        } else {
-            // Otherwise, wait for metadata to load
-            video.addEventListener("loadedmetadata", playLastFiveSeconds, { once: true });
-        }
-
+        // 3. Attach listeners using the stable references
         video.addEventListener("timeupdate", handleTimeUpdate);
 
-        // Cleanup
+        if (video.readyState >= 1) {
+            playLastFiveSeconds().catch(console.error);
+        } else {
+            video.addEventListener("loadedmetadata", handleMetadata, { once: true });
+        }
+
+        // 4. Cleanup using the EXACT same references
         return () => {
-            video.removeEventListener("loadedmetadata", playLastFiveSeconds);
+            video.removeEventListener("loadedmetadata", handleMetadata);
             video.removeEventListener("timeupdate", handleTimeUpdate);
             video.pause();
-            video.currentTime = 0;
         };
     }, [activeIndex]);
 
@@ -173,7 +186,7 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
                         key={project._id}
                         href={`/film/${project.photoid}`}
                         onClick={(e) => handleProjectClick(e, `/film/${project.photoid}`, index)}
-                        className={`relative w-screen h-full flex-shrink-0 overflow-hidden block cursor-grab active:cursor-grabbing transition-all duration-800 ease-in-out ${
+                        className={`relative w-screen h-full shrink-0 overflow-hidden block cursor-grab active:cursor-grabbing transition-all duration-800 ease-in-out ${
                             isTransitioning === index ? "scale-[1.2] opacity-0 blur-sm z-50" : "scale-100 opacity-100 z-10"
                         }`}
                         onDragStart={(e) => e.preventDefault()}
@@ -190,7 +203,7 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
                             <source src={`https://stream.mux.com/${project.playbackId}.m3u8?rendition=720p`} media="(min-width: 768px)" />
                             <source src={`https://stream.mux.com/${project.playbackId}.m3u8?rendition=480p`} />
                         </video>
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/20 pointer-events-none z-20" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-black/20 pointer-events-none z-20" />
                     </Link>
                 ))}
             </section>

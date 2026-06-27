@@ -8,7 +8,7 @@ export default function AboutPage() {
 
                     {/* Left Column: Bio */}
                     <div className="flex flex-col gap-12">
-                        <h1 className="text-4xl font-bold tracking-tight">HI. I'M [YOUR NAME].</h1>
+                        <h1 className="text-4xl font-bold tracking-tight">HI. I AM [YOUR NAME].</h1>
 
                         <div className="text-lg leading-relaxed text-neutral-300 space-y-6">
                             <p>

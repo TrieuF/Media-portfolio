@@ -8,7 +8,7 @@ export default function ContactPage() {
             <div className="max-w-2xl w-full pl-0 md:pl-20">
                 {/* Heading */}
                 <h1 className="text-4xl md:text-6xl font-bold mb-16 tracking-tight">
-                    Let's work<br /> together.
+                    Let&apos;s work<br /> together.
                 </h1>
 
                 {/* Contact Links */}

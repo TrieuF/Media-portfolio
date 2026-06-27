@@ -3,6 +3,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Add fallbacks here */
+  --font-geist-sans: sans-serif;
+  --font-geist-mono: monospace;
 }
 
 @theme inline {

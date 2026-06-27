@@ -49,7 +49,7 @@ export default function PhotoGallery({ project }: { project?: ProjectDocument })
             </motion.div>
 
             {/* Centered Floating Gallery Controls */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[9999] bg-black/50 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 flex items-center gap-8 shadow-2xl">
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-9999 bg-black/50 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 flex items-center gap-8 shadow-2xl">
                 <button
                     onClick={() => setActiveIndex((p) => (p > 0 ? p - 1 : media.length - 1))}
                     className="text-sm uppercase tracking-[0.2em] hover:text-white/60 transition-colors"
