@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import {AnimatePresence} from "framer-motion";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,20 +19,17 @@ export const metadata: Metadata = {
   description: "portfolio of all my videography and photography",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+// app/layout.tsx
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-    <body className="min-h-full flex flex-col">
-    <Header brandName={"Trieu Fu-Khai"} brandTitle={"Hobby Content Creator"}/>
-    {children}
-    </body>
-    </html>
+      <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <body className="h-screen flex flex-col overflow-hidden">
+      <Header brandName={"Trieu Fu-Khai"} brandTitle={"Hobby Content Creator"}/>
+      <main className="flex-grow relative">
+        {children}
+      </main>
+      </body>
+      </html>
   );
 }
+

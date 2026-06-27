@@ -18,23 +18,34 @@ export default defineType({
       options: {source: 'title', maxLength: 96},
       validation: (Rule) => Rule.required(),
     }),
+    // --- ADDED CATEGORIES REFERENCE FIELD ---
+    defineField({
+      name: 'categories',
+      title: 'Categories',
+      type: 'array',
+      description: 'Tag this project with one or more categories.',
+      of: [{type: 'reference', to: [{type: 'category'}]}],
+    }),
     // --- LAYOUT CONTROLS ---
     defineField({
       name: 'galleryLayout',
       title: 'Gallery Presentation Style',
       type: 'string',
-      description: 'How should the images/videos behave on the frontend?',
+      description: 'How should the media behave on the frontend?',
       options: {
         list: [
           {
-            title: 'Cinematic Stack (Large vertical scroll, great for videos + stills)',
-            value: 'stack',
+            title: 'Video Style (Large vertical stack layout, great for reels + clips)',
+            value: 'video',
           },
-          {title: 'Grid / Masonry (Clean thumbnail grid, great for 40+ photos)', value: 'grid'},
+          {
+            title: 'Photos Style (Clean thumbnail grid layout, great for stills)',
+            value: 'photos',
+          },
         ],
         layout: 'radio',
       },
-      initialValue: 'stack',
+      initialValue: 'video', // Defaults to video style
     }),
     // --- TEXT & CREDITS ---
     defineField({

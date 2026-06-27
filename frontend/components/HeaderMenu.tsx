@@ -50,7 +50,7 @@ export default function HeaderMenu({brandName, brandTitle}: HeaderProps) {
                         initial="hidden"
                         animate="visible"
                         exit="exit"
-                        className="fixed inset-0 w-screen h-screen bg-yellow-400 p-8 flex flex-col justify-center items-center"
+                        className="fixed inset-0 w-screen h-screen bg-gray-800 p-8 flex flex-col justify-center items-center"
                     >
                         {/* Brand link placed at the top */}
                         <header className="fixed top-0 left-0 w-full z-50 bg-transparent backdrop-blur-none">

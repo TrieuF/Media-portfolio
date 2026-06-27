@@ -1,19 +1,19 @@
 import {defineConfig} from 'sanity'
-import {structureTool} from 'sanity/structure' // The modern v3+ structure builder
+import {structureTool} from 'sanity/structure'
 import {muxInput} from 'sanity-plugin-mux-input'
 import {schemaTypes} from './schemaTypes'
 
-// 1. Define which document types should be treated as Singletons
-const singletonTypes = new Set(['siteSettings'])
+// 1. UPDATED: Swapped 'dashboard' out for your correct 'highlightedVideos' type token
+const singletonTypes = new Set(['siteSettings', 'highlightedVideos'])
 
-// 2. Filter actions so you can't accidentally delete your site settings
+// 2. Filter actions so you can't accidentally delete your settings configurations
 const singletonActions = new Set(['publish', 'discardChanges', 'restore'])
 
 export default defineConfig({
   name: 'default',
   title: 'Portfolio Studio',
 
-  projectId: 'y9cpmpmf', // Replace with your real Project ID
+  projectId: 'y9cpmpmf',
   dataset: 'production',
 
   plugins: [
@@ -23,12 +23,20 @@ export default defineConfig({
         S.list()
           .title('Content')
           .items([
-            // Dedicated direct link to Site Settings
-            S.listItem().title('Site Settings').id('siteSettings').child(
-              S.document().schemaType('siteSettings').documentId('siteSettings'), // Hardcodes the ID so there is only ever one file
-            ),
+            // Dedicated direct link to Site Settings Singleton
+            S.listItem()
+              .title('Site Settings')
+              .id('siteSettings')
+              .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
+
+            // FIXED: Updated mapping names, matching titles, and resolved your typo string
+            S.listItem()
+              .title('Highlighted Videos')
+              .id('mainHighlightedVideos')
+              .child(S.document().schemaType('highlightedVideos').documentId('mainDashboard')),
+
             S.divider(),
-            // Automatically list the standard repeatable documents
+            // Automatically list the standard repeatable collections
             S.documentTypeListItem('project').title('Projects'),
             S.documentTypeListItem('category').title('Categories'),
           ]),
@@ -37,12 +45,12 @@ export default defineConfig({
 
   schema: {
     types: schemaTypes,
-    // Prevents "Site Settings" from showing up in the global "Create New (+)" document options menu
+    // Prevents Singletons from showing up in the global "Create New (+)" options menu
     templates: (prev) => prev.filter((template) => !singletonTypes.has(template.id)),
   },
 
   document: {
-    // Restricts singletons down to safety actions only (No duplicate, no delete)
+    // Restricts singletons down to structural safety actions only (No duplicating, no deleting)
     actions: (prev, {schemaType}) => {
       if (singletonTypes.has(schemaType)) {
         return prev.filter(({action}) => action && singletonActions.has(action))

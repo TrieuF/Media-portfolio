@@ -1,36 +1,34 @@
-// app/film/[filmid]/page.tsx (Server Component)
-import CreditTrigger from "@/components/CreditTrigger";
+import { client } from "@/sanity/client";
+import VideoPlayer from "@/components/VideoPlayer";
+import { ProjectDocument } from "@/types";
 
-export default async function Home({
-                                       params,
-                                   }: {
-    params: Promise<{ filmid: string }>
-}) {
+async function getProject(slug: string): Promise<ProjectDocument | null> {
+    const query = `*[_type == "project" && slug.current == $slug][0]{
+        ...,
+        "mediaGallery": mediaGallery[]{
+            _type == "image" => {
+                "type": "photo",
+                _key,
+                "alt": alt,
+                "aspectRatioPreference": aspectRatioPreference,
+                "url": asset->url
+            },
+            _type == "videoBlock" => {
+                "type": "video",
+                _key,
+                "caption": caption,
+                "playbackId": video.asset->playbackId
+            }
+        }
+    }`;
+    return await client.fetch(query, { slug });
+}
+
+export default async function Page({ params }: { params: { filmid: string } }) {
     const { filmid } = await params;
+    const project = await getProject(filmid);
 
-    // In a real app, you would fetch your data here using the filmid
-    // const filmData = await fetchFilmData(filmid);
+    if (!project) return <div>Project not found.</div>;
 
-    // Using mock data for illustration
-    const filmData = {
-        title: filmid.replace(/-/g, ' ').toUpperCase(),
-        description: "This is a detailed description of the film project.",
-        credits: [
-            { role: "Director", name: "Director Name" },
-            { role: "DP", name: "Cinematographer Name" }
-        ]
-    };
-
-    return (
-        <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
-            <h1 className="text-5xl font-bold mb-8">{filmData.title}</h1>
-
-            {/* Pass the dynamic data into the interactive trigger */}
-            <CreditTrigger
-                title={filmData.title}
-                description={filmData.description}
-                credits={filmData.credits}
-            />
-        </div>
-    );
+    return <VideoPlayer project={project} />;
 }

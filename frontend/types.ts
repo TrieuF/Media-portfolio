@@ -1,44 +1,38 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
+import { type SanityDocument } from "next-sanity";
 
-export interface GalleryStill {
-  id: string;
+export interface CreditItem {
+  _key: string;
+  role?: string;
+  name?: string;
+  instagram?: string;
+}
+
+export interface VideoItem {
+  _type: 'videoBlock';
+  _key: string;
+  playbackId: string;
+  caption?: string;
+}
+
+export interface PhotoItem {
+  _type: 'image';
+  _key: string;
   url: string;
-  title?: string;
-  subtitle?: string;
-  size?: 'normal' | 'wide' | 'full'; // Styling layout hints for the photo grid
+  alt?: string;
 }
 
-export interface Project {
-  id: string;
-  title: string;
-  client: string;
-  subtitle: string;
-  category: 'videography' | 'photography' | 'direction';
-  role: string;
-  year: string;
-  description: string;
-  heroVideoUrl: string; // MP4, Vimeo, YouTube, or Mux stream link
-  heroImageUrl: string; // Fallback image and thumbnail
-  credits: { label: string; value: string }[];
-  galleryStills: GalleryStill[];
-  featured?: boolean;
-}
+// Define the union correctly
+export type GalleryItem = PhotoItem | VideoItem;
 
-export interface ProfileSettings {
-  name: string;
+export interface ProjectDocument extends SanityDocument {
   title: string;
-  bio: string;
-  aboutText: string;
-  aboutImageUrl: string;
-  contactEmail: string;
-  phone?: string;
-  telegram?: string;
-  vimeoUrl?: string;
-  instagramUrl?: string;
-  linkedinUrl?: string;
-  selectedClients: string[];
-  awards: { year: string; title: string; category?: string }[];
+  photoid: string;
+  playbackId?: string; // Add this here
+  galleryLayout?: "video" | "photos";
+  description?: string;
+  credits?: CreditItem[];
+  coverMedia?: {
+    asset?: { url: string };
+  };
+  mediaGallery?: GalleryItem[];
 }
