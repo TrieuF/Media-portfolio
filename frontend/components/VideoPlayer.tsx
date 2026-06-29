@@ -36,10 +36,10 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
 
     return (
         // Wrapper ensures the slide-in animation happens without scrollbars
-        <div className="fixed inset-0 w-screen h-screen bg-black overflow-hidden">
+        <div className="w-full h-screen bg-black relative">
             <motion.main
                 ref={containerRef}
-                className="fixed inset-0 z-50 w-screen h-screen bg-black text-white origin-center"
+                className=" z-50 w-full h-full bg-black text-white origin-center"
 
                 // 1. Zoom Out Parameters: Start large, finish at 1:1
                 initial={{
@@ -70,7 +70,7 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                 <video
                     ref={videoRef}
                     src={`https://stream.mux.com/${videoItem.playbackId}.m3u8`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                     onTimeUpdate={(e) => {
                         const v = e.currentTarget;
                         setProgress((v.currentTime / v.duration) * 100);

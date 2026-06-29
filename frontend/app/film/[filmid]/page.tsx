@@ -1,5 +1,5 @@
 import { client } from "@/sanity/client";
-import VideoPlayer from "@/components/VideoPlayer";
+import VideoandPhotoGallery from "@/components/VideoandPhotoGallery";
 import { ProjectDocument } from "@/types";
 
 async function getProject(slug: string): Promise<ProjectDocument | null> {
@@ -7,14 +7,13 @@ async function getProject(slug: string): Promise<ProjectDocument | null> {
         ...,
         "mediaGallery": mediaGallery[]{
             _type == "image" => {
-                "type": "photo",
+                _type, 
                 _key,
                 "alt": alt,
-                "aspectRatioPreference": aspectRatioPreference,
                 "url": asset->url
             },
             _type == "videoBlock" => {
-                "type": "video",
+                _type,
                 _key,
                 "caption": caption,
                 "playbackId": video.asset->playbackId
@@ -25,10 +24,11 @@ async function getProject(slug: string): Promise<ProjectDocument | null> {
 }
 
 export default async function Page({ params }: { params: { filmid: string } }) {
+    // Await the params to be safe with Next.js 15+ requirements
     const { filmid } = await params;
     const project = await getProject(filmid);
 
-    if (!project) return <div>Project not found.</div>;
+    if (!project) return <div className="text-white p-12">Project not found.</div>;
 
-    return <VideoPlayer project={project} />;
+    return <VideoandPhotoGallery project={project} />;
 }

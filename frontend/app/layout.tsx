@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
       <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="h-screen flex flex-col overflow-hidden">
+      <body className="h-full min-h-screen flex flex-col overflow-y-auto no-scrollbar">
       <Header brandName={"Trieu Fu-Khai"} brandTitle={"Hobby Content Creator"}/>
       <main className="grow relative">
         {children}

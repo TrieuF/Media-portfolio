@@ -170,7 +170,10 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
             onMouseLeave={terminateGesture}
         >
             <header className="absolute bottom-5 left-0 w-full z-30 p-6 md:p-12 pointer-events-none">
-                <h1 className="text-lg md:text-xl font-medium tracking-[0.25em] uppercase mix-blend-difference">Portfolio</h1>
+
+                <h1 className="hidden md:block text-lg md:text-xl font-medium tracking-[0.25em] uppercase mix-blend-difference">
+                    Portfolio
+                </h1>
             </header>
 
             <section

@@ -2,14 +2,16 @@ import { client } from "@/sanity/client";
 import PortfolioList from "@/components/PortfolioList";
 import { type ProjectDocument } from "@/types";
 
-const PHOTO_PROJECTS_QUERY = `*[
-  _type == "project" 
-  && (galleryLayout == "photos" || galleryLayout == "grid" || !defined(galleryLayout))
-  && defined(slug.current)
-]|order(_createdAt desc){
+const PHOTO_PROJECTS_QUERY = `*[ _type == "project" 
+ && galleryLayout == "photos"] | order(_createdAt desc) {
   _id,
+  _type,
+  _createdAt,
+  _updatedAt,
+  _rev,
   title,
-  "photoid": slug.current,
+  slug, 
+  "galleryLayout" : "photos",
   coverMedia { 
     asset->{ url } 
   }

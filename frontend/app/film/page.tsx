@@ -10,7 +10,8 @@ const FILM_QUERY = `*[_type == "project" && "videoBlock" in mediaGallery[]._type
   _updatedAt,
   _rev,
   title,
-  "photoid": slug.current,
+  slug,
+  "galleryLayout": "video",
   coverMedia {
     asset -> {
       url
@@ -37,6 +38,8 @@ export default async function FilmPage() {
         <main className="w-screen h-screen overflow-hidden bg-gray-800  dark:bg-[#1a1917]]">
             {/* Feeds the data straight into your working, fluid photo layout component */}
             <PortfolioList projects={projects} />
+
+
         </main>
     );
 }
