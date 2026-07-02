@@ -36,3 +36,8 @@ export interface ProjectDocument extends SanityDocument {
   };
   mediaGallery?: GalleryItem[];
 }
+
+export interface HeaderProps {
+  brandName: string;
+  brandTitle: string;
+}

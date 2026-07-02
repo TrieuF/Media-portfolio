@@ -18,14 +18,6 @@ export default defineType({
       options: {source: 'title', maxLength: 96},
       validation: (Rule) => Rule.required(),
     }),
-    // --- ADDED CATEGORIES REFERENCE FIELD ---
-    defineField({
-      name: 'categories',
-      title: 'Categories',
-      type: 'array',
-      description: 'Tag this project with one or more categories.',
-      of: [{type: 'reference', to: [{type: 'category'}]}],
-    }),
     // --- LAYOUT CONTROLS ---
     defineField({
       name: 'galleryLayout',
@@ -90,6 +82,7 @@ export default defineType({
       title: 'Media Assets',
       type: 'array',
       description: 'Drag and drop all your photos and Mux videos here.',
+      validation: (Rule) => Rule.required(),
       of: [
         // Photo Block
         {

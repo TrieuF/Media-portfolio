@@ -5,44 +5,77 @@ export default defineType({
   title: 'Site Settings',
   type: 'document',
   fields: [
+    // Page Identity
     defineField({
-      name: 'siteName',
-      title: 'Site Name / Logo Text',
+      name: 'pageTitle',
+      title: 'Page Title',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+
+    // Brand Identity
+    defineField({
+      name: 'brandName',
+      title: 'Brand Name',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'brandTitle',
+      title: 'Brand Title',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+
+    // Contact & Socials
+    defineField({
+      name: 'email',
+      title: 'Email',
+      type: 'string',
+      validation: (Rule) => Rule.required().email(),
+    }),
+    defineField({
+      name: 'instagramName',
+      title: 'Instagram Username',
       type: 'string',
     }),
     defineField({
-      name: 'aboutText',
-      title: 'About / Bio Intro',
+      name: 'linkedinName',
+      title: 'LinkedIn Username',
+      type: 'string',
+    }),
+    defineField({
+      name: 'githubName',
+      title: 'GitHub Username',
+      type: 'string',
+    }),
+
+    // Bio Section
+    defineField({
+      name: 'bioText',
+      title: 'Bio Text',
       type: 'text',
-      rows: 4,
-      description: 'Keep it brief',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'contactEmail',
-      title: 'Contact Email',
-      type: 'string',
-    }),
-    defineField({
-      name: 'socialLinks',
-      title: 'Social Links',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            defineField({name: 'platform', type: 'string', title: 'Platform (e.g., Instagram)'}),
-            defineField({name: 'url', type: 'url', title: 'URL'}),
-          ],
-        },
-      ],
-    }),
-    defineField({
-      name: 'featuredProjects',
-      title: 'Homepage Project Order',
-      type: 'array',
-      description:
-        'Drag and drop projects to set the exact order they appear on your homepage grid.',
-      of: [{type: 'reference', to: [{type: 'project'}]}],
+      name: 'portraitPhoto',
+      title: 'Portrait Photo',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+      validation: (Rule) => Rule.required(),
     }),
   ],
+  preview: {
+    select: {
+      title: 'pageTitle',
+    },
+  },
 })

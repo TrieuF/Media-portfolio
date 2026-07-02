@@ -35,38 +35,23 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
     };
 
     return (
-        // Wrapper ensures the slide-in animation happens without scrollbars
         <div className="w-full h-screen bg-black relative">
             <motion.main
                 ref={containerRef}
-                className=" z-50 w-full h-full bg-black text-white origin-center"
-
-                // 1. Zoom Out Parameters: Start large, finish at 1:1
-                initial={{
-                    opacity: 0,
-                    scale: 1.15, // Starts slightly zoomed in
-                }}
-
-                animate={{
-                    opacity: 1,
-                    scale: 1,    // Zooms out to fill screen exactly
-                }}
-
-                // 2. Consistent Exit Animation
+                className="z-50 w-full h-full bg-black text-white origin-center"
+                initial={{ opacity: 0, scale: 1.15 }}
+                animate={{ opacity: 1, scale: 1 }}
                 exit={{
                     opacity: 0,
-                    scale: 0.95, // Zooms in/shrinks on exit to create a "receding" effect
+                    scale: 0.95,
                     transition: { duration: 0.4, ease: [0.33, 1, 0.68, 1] }
                 }}
-
-                // 3. The "Secret Sauce" Easing Curve
                 transition={{
                     duration: 0.8,
                     ease: [0.22, 1, 0.36, 1],
                     delay: 0.1,
                 }}
             >
-                {/* Video takes full space. Header sits over this (fixed). */}
                 <video
                     ref={videoRef}
                     src={`https://stream.mux.com/${videoItem.playbackId}.m3u8`}
@@ -78,8 +63,8 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                     onClick={togglePlay}
                 />
 
-                {/* Controls - Absolute positioned at the bottom */}
-                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-112.5 p-4 bg-black/50 backdrop-blur-md rounded-full z-20">
+                {/* Controls */}
+                <div className="absolute bottom-15 left-1/2 -translate-x-1/2 w-112.5 p-4 bg-black/50 backdrop-blur-md rounded-full z-20">
                     <input
                         type="range"
                         min="0"
@@ -95,12 +80,16 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                     />
 
                     <div className="flex justify-center gap-6 text-sm uppercase tracking-widest">
-                        <button onClick={togglePlay}>{isPlaying ? "Pause" : "Play"}</button>
-                        <button onClick={() => { if(videoRef.current) { videoRef.current.muted = !videoRef.current.muted; setIsMuted(videoRef.current.muted); } }}>
+                        <button className="opacity-70 hover:opacity-100 transition-opacity" onClick={togglePlay}>
+                            {isPlaying ? "Pause" : "Play"}
+                        </button>
+                        <button className="opacity-70 hover:opacity-100 transition-opacity" onClick={() => { if(videoRef.current) { videoRef.current.muted = !videoRef.current.muted; setIsMuted(videoRef.current.muted); } }}>
                             {isMuted ? "Unmute" : "Mute"}
                         </button>
-                        <button onClick={() => setShowCredits(true)}>Credits</button>
-                        <button onClick={() => !document.fullscreenElement ? containerRef.current?.requestFullscreen() : document.exitFullscreen()}>
+                        <button className="opacity-70 hover:opacity-100 transition-opacity" onClick={() => setShowCredits(true)}>
+                            Credits
+                        </button>
+                        <button className="opacity-70 hover:opacity-100 transition-opacity" onClick={() => !document.fullscreenElement ? containerRef.current?.requestFullscreen() : document.exitFullscreen()}>
                             Fullscreen
                         </button>
                     </div>
@@ -111,7 +100,12 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                     <div className="w-full h-[50vh] bg-neutral-900 p-12 border-t border-white/10 flex flex-col">
                         <div className="flex justify-between items-center mb-8">
                             <h2 className="text-2xl font-bold">{project.title}</h2>
-                            <button onClick={() => setShowCredits(false)} className="underline">Close</button>
+                            <button
+                                onClick={() => setShowCredits(false)}
+                                className="underline opacity-70 hover:opacity-100 transition-opacity"
+                            >
+                                Close
+                            </button>
                         </div>
 
                         <div className="flex-1 overflow-y-auto pr-4 no-scrollbar">

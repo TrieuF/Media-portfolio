@@ -29,7 +29,15 @@ export default defineType({
         },
       ],
       validation: (Rule) =>
-        Rule.max(5).error('You can only showcase a maximum of 5 videos on the main screen.'),
+        Rule.min(1)
+          .error('You must include at least one video.')
+          .max(5)
+          .error('You can only showcase a maximum of 5 videos on the main screen.'),
     }),
   ],
+  preview: {
+    select: {
+      title: 'Highlighted Videos',
+    },
+  },
 })

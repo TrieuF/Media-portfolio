@@ -38,7 +38,6 @@ export default defineConfig({
             S.divider(),
             // Automatically list the standard repeatable collections
             S.documentTypeListItem('project').title('Projects'),
-            S.documentTypeListItem('category').title('Categories'),
           ]),
     }),
   ],
