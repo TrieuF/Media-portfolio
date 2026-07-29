@@ -1,28 +1,13 @@
-import { client } from "@/sanity/client";
 import PortfolioList from "@/components/PortfolioList";
-import { type ProjectDocument } from "@/types";
-
-const PHOTO_PROJECTS_QUERY = `*[ _type == "project" 
- && galleryLayout == "photos"] | order(_createdAt desc) {
-  _id,
-  _type,
-  _createdAt,
-  _updatedAt,
-  _rev,
-  title,
-  slug, 
-  "galleryLayout" : "photos",
-  coverMedia { 
-    asset->{ url } 
-  }
-}`;
+import { sanityFetch } from "@/lib/sanity/fetch";
+import { PHOTO_QUERY } from "@/lib/sanity/queries";
+import { type ProjectDocument } from "@/lib/sanity/sanity.types";
 
 export default async function PhotoPage() {
-    const projects = await client.fetch<ProjectDocument[]>(
-        PHOTO_PROJECTS_QUERY,
-        {},
-        { next: { revalidate: 30 } }
-    );
+    const projects = await sanityFetch<ProjectDocument[]>({
+        query: PHOTO_QUERY,
+        tags: ["project"],
+    });
 
     if (!projects || projects.length === 0) {
         return (

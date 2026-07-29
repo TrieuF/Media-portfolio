@@ -1,4 +1,5 @@
 import { type SanityDocument } from "next-sanity";
+import {SanityImageSource} from "@sanity/image-url";
 
 export interface CreditItem {
   _key: string;
@@ -41,3 +42,20 @@ export interface HeaderProps {
   brandName: string;
   brandTitle: string;
 }
+
+export type SiteSettings = {
+  email?: string;
+  instagramName?: string;
+  githubName?: string;
+  linkedinName?: string;
+};
+export type AboutSettings = {
+  brandName?: string;
+  brandTitle?: string;
+  bioText?: string;
+  email?: string;
+  instagramName?: string;
+  githubName?: string;
+  linkedinName?: string;
+  portraitPhoto?: SanityImageSource;
+};

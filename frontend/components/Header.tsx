@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import HeaderMenu from "@/components/HeaderMenu";
-import {HeaderProps} from "@/types";
+import {HeaderProps} from "@/lib/sanity/sanity.types";
 
 
 export default function Header({ brandName, brandTitle }: HeaderProps) {

@@ -2,42 +2,42 @@
 
 import React, { useRef } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
-import { type ProjectDocument } from "@/types";
+import { type ProjectDocument } from "@/lib/sanity/sanity.types";
 import VideoPlayer from "@/components/VideoPlayer";
 import PhotoGallery from "@/components/PhotoGallery";
 
 export default function VideoandPhotoGallery({ project }: { project: ProjectDocument }) {
-    const photosOnly = project.mediaGallery?.filter((item) => item._type === 'image') || [];
-    const galleryProject = { ...project, mediaGallery: photosOnly };
+    // Filter media items safely using type discriminant
+    const photosOnly = project?.mediaGallery?.filter((item) => item._type === "image") || [];
+    const hasPhotos = photosOnly.length > 0;
 
-    // 1. Hook into the scroll progress of the page
-    const containerRef = useRef(null);
+    // Construct a sanitized project document containing only photo media
+    const galleryProject: ProjectDocument = { ...project, mediaGallery: photosOnly };
+
+    const containerRef = useRef<HTMLDivElement>(null);
+
     const { scrollYProgress } = useScroll({
         target: containerRef,
-        offset: ["start start", "end end"]
+        offset: ["start start", "end end"],
     });
 
-    // 2. Add the "slingy" spring physics
-    // Damping/stiffness here controls the "resistance" and "bounce"
     const springConfig = { stiffness: 60, damping: 15 };
     const scrollSpring = useSpring(scrollYProgress, springConfig);
 
-    // 3. Transform the scroll into a visual effect (e.g., slight parallax or scale)
     const opacity = useTransform(scrollSpring, [0, 0.2], [1, 0.5]);
     const scale = useTransform(scrollSpring, [0, 0.2], [1, 0.95]);
 
     return (
-        <main ref={containerRef} className="w-full bg-black">
+        <main ref={containerRef} className="w-full bg-black relative overflow-x-hidden">
             {/* Hero Video Section */}
             <motion.section
-                style={{ opacity, scale }}
-                className="relative w-full h-screen sticky top-0"
+                style={hasPhotos ? { opacity, scale } : {}}
+                className="w-full h-screen sticky top-0 z-0 overflow-hidden"
             >
                 <VideoPlayer project={project} />
 
-                {/* Indicator remains clickable if you want to force the scroll */}
-                {photosOnly.length > 0 && (
-                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-50 animate-bounce text-white/70">
+                {hasPhotos && (
+                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 animate-bounce text-white/70 pointer-events-none">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M6 9l6 6 6-6" />
                         </svg>
@@ -45,9 +45,9 @@ export default function VideoandPhotoGallery({ project }: { project: ProjectDocu
                 )}
             </motion.section>
 
-            {/* Gallery Section */}
-            {photosOnly.length > 0 && (
-                <section className="relative w-full min-h-screen bg-black z-10">
+            {/* Gallery Section - Only renders if photos exist */}
+            {hasPhotos && (
+                <section className="relative w-full min-h-screen bg-black z-10 overflow-x-hidden">
                     <PhotoGallery project={galleryProject} />
                 </section>
             )}

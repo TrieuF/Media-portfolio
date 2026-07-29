@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type ProjectDocument } from "@/types";
+import { urlFor } from "@/lib/sanity/image";
+import { type ProjectDocument } from "@/lib/sanity/sanity.types";
 
 export default function HighlightedVideos({ projects }: { projects: ProjectDocument[] }) {
     const router = useRouter();
@@ -25,7 +26,6 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
         videoRefs.current[index] = el;
     }, []);
 
-    // 1. FIXED: Explicitly typed Event to avoid UMD global lookup
     const handleProjectClick = (
         e: React.MouseEvent<HTMLAnchorElement>,
         path: string,
@@ -43,12 +43,10 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
         }, 800);
     };
 
-    // 2. FIXED: Robust Video Playback with AbortError handling
     useEffect(() => {
         const video = videoRefs.current[activeIndex];
         if (!video) return;
 
-        // 1. Define the function as a constant so the reference remains stable
         const playLastFiveSeconds = async () => {
             if (!Number.isFinite(video.duration)) return;
             video.currentTime = Math.max(0, video.duration - 5);
@@ -62,7 +60,6 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
             }
         };
 
-        // 2. Define a wrapper that explicitly catches the promise
         const handleMetadata = () => {
             playLastFiveSeconds().catch(console.error);
         };
@@ -73,7 +70,6 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
             }
         };
 
-        // 3. Attach listeners using the stable references
         video.addEventListener("timeupdate", handleTimeUpdate);
 
         if (video.readyState >= 1) {
@@ -82,7 +78,6 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
             video.addEventListener("loadedmetadata", handleMetadata, { once: true });
         }
 
-        // 4. Cleanup using the EXACT same references
         return () => {
             video.removeEventListener("loadedmetadata", handleMetadata);
             video.removeEventListener("timeupdate", handleTimeUpdate);
@@ -90,7 +85,6 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
         };
     }, [activeIndex]);
 
-    // 2. RESPONSIVE MOUSE WHEEL SCROLLING
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
@@ -116,7 +110,6 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
         return () => container.removeEventListener("wheel", handleWheel);
     }, [activeIndex, validProjects.length]);
 
-    // Cleanup: Snap back
     useEffect(() => {
         if (visualOffset === 0) return;
         const timer = setTimeout(() => {
@@ -126,7 +119,6 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
         return () => clearTimeout(timer);
     }, [visualOffset]);
 
-    // 3. GESTURE HANDLERS
     const initiateGesture = (clientX: number) => {
         startX.current = clientX;
         setIsDragging(true);
@@ -170,7 +162,6 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
             onMouseLeave={terminateGesture}
         >
             <header className="absolute bottom-5 left-0 w-full z-30 p-6 md:p-12 pointer-events-none">
-
                 <h1 className="hidden md:block text-lg md:text-xl font-medium tracking-[0.25em] uppercase mix-blend-difference">
                     Portfolio
                 </h1>
@@ -184,31 +175,39 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
                     transition: isDragging ? "none" : "transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
                 }}
             >
-                {validProjects.map((project, index) => (
-                    <Link
-                        key={project._id}
-                        href={`/film/${project.photoid}`}
-                        onClick={(e) => handleProjectClick(e, `/film/${project.photoid}`, index)}
-                        className={`relative w-screen h-full shrink-0 overflow-hidden block cursor-grab active:cursor-grabbing transition-all duration-800 ease-in-out ${
-                            isTransitioning === index ? "scale-[1.2] opacity-0 blur-sm z-50" : "scale-100 opacity-100 z-10"
-                        }`}
-                        onDragStart={(e) => e.preventDefault()}
-                    >
-                        <video
-                            ref={(el) => setVideoRef(index, el)}
-                            muted
-                            playsInline
-                            controls={false}
-                            preload="auto"
-                            className="w-full h-full object-cover object-center brightness-[0.75] pointer-events-none"
+                {validProjects.map((project, index) => {
+                    // 2. Generate optimized cover URL using image.ts (with fallback safety)
+                    const posterUrl = project.coverImage
+                        ? urlFor(project.coverImage).width(1920).height(1080).fit("crop").format("webp").url()
+                        : undefined;
+
+                    return (
+                        <Link
+                            key={project._id}
+                            href={`/frontend/app/(website)/film/${project.photoid}`}
+                            onClick={(e) => handleProjectClick(e, `/film/${project.photoid}`, index)}
+                            className={`relative w-screen h-full shrink-0 overflow-hidden block cursor-grab active:cursor-grabbing transition-all duration-800 ease-in-out ${
+                                isTransitioning === index ? "scale-[1.2] opacity-0 blur-sm z-50" : "scale-100 opacity-100 z-10"
+                            }`}
+                            onDragStart={(e) => e.preventDefault()}
                         >
-                            <source src={`https://stream.mux.com/${project.playbackId}.m3u8?rendition=1080p`} media="(min-width: 1024px)" />
-                            <source src={`https://stream.mux.com/${project.playbackId}.m3u8?rendition=720p`} media="(min-width: 768px)" />
-                            <source src={`https://stream.mux.com/${project.playbackId}.m3u8?rendition=480p`} />
-                        </video>
-                        <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-black/20 pointer-events-none z-20" />
-                    </Link>
-                ))}
+                            <video
+                                ref={(el) => setVideoRef(index, el)}
+                                poster={posterUrl} // 3. Attach image poster to video tag
+                                muted
+                                playsInline
+                                controls={false}
+                                preload="auto"
+                                className="w-full h-full object-cover object-center brightness-[0.75] pointer-events-none"
+                            >
+                                <source src={`https://stream.mux.com/${project.playbackId}.m3u8?rendition=1080p`} media="(min-width: 1024px)" />
+                                <source src={`https://stream.mux.com/${project.playbackId}.m3u8?rendition=720p`} media="(min-width: 768px)" />
+                                <source src={`https://stream.mux.com/${project.playbackId}.m3u8?rendition=480p`} />
+                            </video>
+                            <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-black/20 pointer-events-none z-20" />
+                        </Link>
+                    );
+                })}
             </section>
 
             <section className="absolute bottom-0 left-0 w-full z-30 p-6 md:p-12 flex flex-col md:flex-row md:items-end md:justify-between gap-6 pointer-events-none">

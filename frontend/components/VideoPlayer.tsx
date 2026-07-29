@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { ProjectDocument, VideoItem } from "@/types";
+import { ProjectDocument, VideoItem } from "@/lib/sanity/sanity.types";
 import { motion } from "framer-motion";
 
 export default function VideoPlayer({ project }: { project: ProjectDocument }) {

@@ -2,11 +2,7 @@
 import {useState} from "react";
 import Link from "next/link";
 import {motion, AnimatePresence, Variants} from "framer-motion";
-
-interface HeaderProps {
-    brandName: string;
-    brandTitle?: string;
-}
+import {HeaderProps} from "@/lib/sanity/sanity.types";
 
 const navItems = [
     {id: 1, label: "Home", href: "/"},

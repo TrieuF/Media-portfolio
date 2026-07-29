@@ -1,8 +1,13 @@
-import { client } from "@/sanity/client";
+import { sanityFetch } from "@/lib/sanity/fetch";
+import { SITE_SETTINGS_QUERY } from "@/lib/sanity/queries";
+import {SiteSettings} from "@/lib/sanity/sanity.types";
+
 
 export default async function ContactPage() {
-    // Fetch the site settings directly in the page
-    const settings = await client.fetch(`*[_type == "siteSettings"][0]`);
+    const settings = await sanityFetch<SiteSettings | null>({
+        query: SITE_SETTINGS_QUERY,
+        tags: ["siteSettings"],
+    });
 
     return (
         <main className="min-h-screen flex items-center justify-start bg-black text-white p-8 md:p-24">

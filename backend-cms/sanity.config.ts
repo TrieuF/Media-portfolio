@@ -17,7 +17,6 @@ export default defineConfig({
   dataset: 'production',
 
   plugins: [
-    muxInput(),
     structureTool({
       structure: (S) =>
         S.list()
@@ -32,18 +31,19 @@ export default defineConfig({
             // FIXED: Updated mapping names, matching titles, and resolved your typo string
             S.listItem()
               .title('Highlighted Videos')
-              .id('mainHighlightedVideos')
-              .child(S.document().schemaType('highlightedVideos').documentId('mainDashboard')),
+              .id('highlightedVideos')
+              .child(S.document().schemaType('highlightedVideos').documentId('highlightedVideos')),
 
             S.divider(),
             // Automatically list the standard repeatable collections
             S.documentTypeListItem('project').title('Projects'),
           ]),
     }),
+    muxInput(),
   ],
 
   schema: {
-    types: schemaTypes
+    types: schemaTypes,
   },
 
   document: {

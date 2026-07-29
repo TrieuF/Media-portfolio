@@ -1,22 +1,13 @@
-import { client } from "@/sanity/client";
 import HighlightedVideos from "@/components/HighlightedVideos";
-import { type ProjectDocument } from "@/types";
-
-const DASHBOARD_QUERY = `*[_type == "dashboard" && _id == "mainDashboard"][0] {
-  "featuredProjects": featuredVideos[]-> {
-    _id,
-    title,
-    "photoid": slug.current,
-    "playbackId": mediaGallery[_type == "videoBlock"][0].video.asset->playbackId
-  }
-}`;
+import { sanityFetch } from "@/lib/sanity/fetch";
+import { HIGHLIGHTVIDEO_QUERY } from "@/lib/sanity/queries";
+import { type ProjectDocument } from "@/lib/sanity/sanity.types";
 
 export default async function HomePage() {
-    const data = await client.fetch<{ featuredProjects: ProjectDocument[] } | null>(
-        DASHBOARD_QUERY,
-        {},
-        { next: { revalidate: 0 } }
-    );
+    const data = await sanityFetch<{ featuredProjects: ProjectDocument[] } | null>({
+        query: HIGHLIGHTVIDEO_QUERY,
+        tags: ["highlightedVideos", "project"],
+    });
 
     const projects = data?.featuredProjects || [];
 
