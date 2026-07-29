@@ -3,10 +3,9 @@ import {structureTool} from 'sanity/structure'
 import {muxInput} from 'sanity-plugin-mux-input'
 import {schemaTypes} from './schemaTypes'
 
-// 1. UPDATED: Swapped 'dashboard' out for your correct 'highlightedVideos' type token
 const singletonTypes = new Set(['siteSettings', 'highlightedVideos'])
 
-// 2. Filter actions so you can't accidentally delete your settings configurations
+// Filter actions so you can't accidentally delete your settings configurations
 const singletonActions = new Set(['publish', 'discardChanges', 'restore'])
 
 export default defineConfig({
@@ -28,14 +27,13 @@ export default defineConfig({
               .id('siteSettings')
               .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
 
-            // FIXED: Updated mapping names, matching titles, and resolved your typo string
+
             S.listItem()
               .title('Highlighted Videos')
               .id('highlightedVideos')
               .child(S.document().schemaType('highlightedVideos').documentId('highlightedVideos')),
 
             S.divider(),
-            // Automatically list the standard repeatable collections
             S.documentTypeListItem('project').title('Projects'),
           ]),
     }),

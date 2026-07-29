@@ -176,7 +176,7 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
                 }}
             >
                 {validProjects.map((project, index) => {
-                    // 2. Generate optimized cover URL using image.ts (with fallback safety)
+                    // Generate optimized cover URL using image.ts (with fallback safety)
                     const posterUrl = project.coverImage
                         ? urlFor(project.coverImage).width(1920).height(1080).fit("crop").format("webp").url()
                         : undefined;

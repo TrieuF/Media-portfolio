@@ -26,11 +26,11 @@ export async function POST(req: NextRequest) {
         }
 
         // 2. Revalidate general tag for document type (e.g., "project", "siteSettings")
-        revalidateTag(body._type, 'max'); // Line 29: Added second argument 'max'
+        revalidateTag(body._type, 'max');
 
         // 3. Revalidate specific document tag if a slug is present (e.g., "project:my-photo-slug")
         if (body.slug?.current) {
-            revalidateTag(`${body._type}:${body.slug.current}`, 'max'); // Line 33: Added second argument 'max'
+            revalidateTag(`${body._type}:${body.slug.current}`, 'max');
         }
 
         return NextResponse.json({
