@@ -74,8 +74,8 @@ export default function PortfolioList({ projects }: { projects: ProjectDocument[
                         >
                             <Link
                                 href={project.galleryLayout === 'video'
-                                    ? `/frontend/app/(website)/film/${project.slug?.current}`
-                                    : `/frontend/app/(website)/photo/${project.slug?.current}`
+                                    ? `/film/${project.slug?.current}`
+                                    : `/photo/${project.slug?.current}`
                                 }
                                 className="inline-block font-display text-3xl md:text-6xl font-bold tracking-[0.2em] uppercase transition-all duration-500 text-white hover:text-transparent"
                                 style={{ WebkitTextStroke: "1.5px white" }}
