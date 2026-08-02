@@ -19,8 +19,6 @@ export default function PortfolioList({ projects }: { projects: ProjectDocument[
                     // 2. Generate optimized image URL using image.ts
                     const imgUrl = project.coverMedia
                         ? urlFor(project.coverMedia)
-                            .width(1600)
-                            .height(1000)
                             .fit("crop")
                             .format("webp")
                             .url()

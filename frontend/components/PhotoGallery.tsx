@@ -17,7 +17,7 @@ export default function PhotoGallery({ project }: { project?: ProjectDocument })
 
     // Safely generate image URL using urlFor helper
     const imageUrl = currentItem && currentItem._type === "image"
-        ? urlFor(currentItem).width(2400).fit("max").format("webp").url()
+        ? urlFor(currentItem).format("webp").url()
         : null;
 
     return (
