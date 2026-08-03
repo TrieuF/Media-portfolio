@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import { urlFor } from "@/lib/sanity/image";
 import { type ProjectDocument } from "@/lib/sanity/sanity.types";
 
@@ -11,62 +10,48 @@ export default function PhotoGallery({ project }: { project?: ProjectDocument })
 
     const media = project?.mediaGallery || [];
 
-    // Preload sowohl das nächste als auch das vorherige Bild
+    // Intelligentes Preloading (Next & Prev)
     useEffect(() => {
-        if (media.length === 0) return;
+        if (media.length <= 1) return;
 
-        // Nächstes Bild berechnen (mit Wrap-Around)
         const nextIndex = (activeIndex + 1) % media.length;
-        const nextItem = media[nextIndex];
-        if (nextItem && nextItem._type === "image") {
-            const imgNext = new window.Image();
-            imgNext.src = urlFor(nextItem).width(2400).fit("max").format("webp").url();
-        }
-
-        // Vorheriges Bild berechnen (mit Wrap-Around)
         const prevIndex = (activeIndex - 1 + media.length) % media.length;
-        const prevItem = media[prevIndex];
-        if (prevItem && prevItem._type === "image") {
-            const imgPrev = new window.Image();
-            imgPrev.src = urlFor(prevItem).width(2400).fit("max").format("webp").url();
-        }
+
+        [nextIndex, prevIndex].forEach((idx) => {
+            const item = media[idx];
+            if (item && item._type === "image") {
+                const img = new window.Image();
+                img.src = urlFor(item).format("webp").url();
+            }
+        });
     }, [activeIndex, media]);
 
     if (!project) return <div className="text-white flex h-screen items-center justify-center">Loading...</div>;
     if (media.length === 0) return <div className="text-white flex h-screen items-center justify-center">No media found.</div>;
 
     const currentItem = media[activeIndex];
-
     const imageUrl = currentItem && currentItem._type === "image"
-        ? urlFor(currentItem).width(2400).fit("max").format("webp").url()
+        ? urlFor(currentItem).format("webp").url()
         : null;
 
     return (
         <main className="min-h-screen w-full bg-black text-white relative overflow-hidden select-none">
             {/* Media Container */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8 }}
-                className="absolute inset-0 w-full h-full"
-            >
+            <div className="absolute inset-0 w-full h-full flex items-center justify-center">
                 <AnimatePresence mode="wait">
                     {currentItem._type === "image" && imageUrl ? (
                         <motion.div
                             key={currentItem._key || activeIndex}
-                            initial={{ opacity: 0, scale: 1.05 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            transition={{ duration: 0.4 }}
-                            className="w-full h-full relative"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className="absolute inset-0 w-full h-full flex items-center justify-center"
                         >
-                            <Image
+                            <img
                                 src={imageUrl}
                                 alt={currentItem.alt || project.title || "Project photo"}
-                                fill
-                                priority={activeIndex === 0}
-                                sizes="100vw"
-                                className="object-contain"
+                                className="w-full h-full object-contain"
                             />
                         </motion.div>
                     ) : (
@@ -75,13 +60,13 @@ export default function PhotoGallery({ project }: { project?: ProjectDocument })
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="w-full h-full flex items-center justify-center"
+                            className="absolute inset-0 w-full h-full flex items-center justify-center"
                         >
                             {/* Video Block Placeholder */}
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </motion.div>
+            </div>
 
             {/* Gallery Controls */}
             <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-50 bg-black/50 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 flex items-center gap-8 shadow-2xl">
