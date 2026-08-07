@@ -121,6 +121,9 @@ export default defineType({
               name: 'video',
               title: 'Mux Video Asset',
               type: 'mux.video', // Handled by sanity-plugin-mux-input
+              options: {
+                max_resolution_tier: '2160p',
+              },
             }),
           ],
         },
