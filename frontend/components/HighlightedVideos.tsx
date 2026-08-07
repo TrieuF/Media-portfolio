@@ -20,7 +20,7 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
     const hasMoved = useRef(false);
     const scrollAccumulator = useRef(0);
 
-    const validProjects = projects.filter((p) => p.playbackId);
+    const validProjects = projects.filter((p) => p.video.playbackId);
 
     const setVideoRef = useCallback((index: number, el: HTMLVideoElement | null) => {
         videoRefs.current[index] = el;

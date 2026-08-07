@@ -92,10 +92,13 @@ export const FILM_BY_SLUG_QUERY = groq`
         _type,
         _key,
         title,
-        video
+        video {
+          ...,
+          "playbackId": asset->playbackId,
+          "assetId": asset->assetId
+        }
       }
     }
   }
 `
-
 

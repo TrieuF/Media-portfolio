@@ -37,6 +37,7 @@ export default defineConfig({
           ]),
     }),
     muxInput({
+      max_resolution_tier: "2160p",
       video_quality: 'basic',
     }),
   ],

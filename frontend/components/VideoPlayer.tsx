@@ -19,6 +19,8 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
 
     if (!videoItem) return <div>No video found for this project.</div>;
 
+    console.log(videoItem);
+
     const togglePlay = async () => {
         if (videoRef.current?.paused) {
             try {
