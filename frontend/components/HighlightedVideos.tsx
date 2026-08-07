@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { urlFor } from "@/lib/sanity/image";
 import { type ProjectDocument } from "@/lib/sanity/sanity.types";
+import MuxVideo from "@mux/mux-video-react";
 
 export default function HighlightedVideos({ projects }: { projects: ProjectDocument[] }) {
     const router = useRouter();
@@ -12,6 +13,9 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
     const [visualOffset, setVisualOffset] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState<number | null>(null);
+
+    // Track playing state per video index to handle the cover->video transition smoothly
+    const [isPlaying, setIsPlaying] = useState<{ [key: number]: boolean }>({});
 
     const containerRef = useRef<HTMLDivElement>(null);
     const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
@@ -22,8 +26,8 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
 
     const validProjects = projects.filter((p) => p.video?.playbackId);
 
-    const setVideoRef = useCallback((index: number, el: HTMLVideoElement | null) => {
-        videoRefs.current[index] = el;
+    const setVideoRef = useCallback((index: number, el: HTMLVideoElement | null | undefined) => {
+        videoRefs.current[index] = el ?? null;
     }, []);
 
     const handleProjectClick = (
@@ -53,6 +57,7 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
 
             try {
                 await video.play();
+                setIsPlaying((prev) => ({ ...prev, [activeIndex]: true }));
             } catch (err) {
                 if (err instanceof Error && err.name !== 'AbortError') {
                     console.error("Playback failed:", err);
@@ -82,6 +87,7 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
             video.removeEventListener("loadedmetadata", handleMetadata);
             video.removeEventListener("timeupdate", handleTimeUpdate);
             video.pause();
+            setIsPlaying((prev) => ({ ...prev, [activeIndex]: false }));
         };
     }, [activeIndex]);
 
@@ -176,34 +182,45 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
                 }}
             >
                 {validProjects.map((project, index) => {
-                    // Generate optimized cover URL using image.ts (with fallback safety)
-                    const posterUrl = project.coverImage
-                        ? urlFor(project.coverImage).width(1920).height(1080).fit("crop").format("webp").url()
+                    const posterUrl = project.coverMedia
+                        ? urlFor(project.coverMedia).width(1920).height(1080).fit("crop").format("webp").url()
                         : undefined;
+
+                    const activeAndPlaying = index === activeIndex && isPlaying[index];
 
                     return (
                         <Link
                             key={project._id}
-                            href={`/frontend/app/(website)/film/${project.photoid}`}
+                            href={`/film/${project.photoid}`}
                             onClick={(e) => handleProjectClick(e, `/film/${project.photoid}`, index)}
                             className={`relative w-screen h-full shrink-0 overflow-hidden block cursor-grab active:cursor-grabbing transition-all duration-800 ease-in-out ${
                                 isTransitioning === index ? "scale-[1.2] opacity-0 blur-sm z-50" : "scale-100 opacity-100 z-10"
                             }`}
                             onDragStart={(e) => e.preventDefault()}
                         >
-                            <video
+                            {/* Underlying Video */}
+                            <MuxVideo
                                 ref={(el) => setVideoRef(index, el)}
-                                poster={posterUrl} // 3. Attach image poster to video tag
+                                playbackId={project.video?.playbackId}
                                 muted
                                 playsInline
                                 controls={false}
                                 preload="auto"
                                 className="w-full h-full object-cover object-center brightness-[0.75] pointer-events-none"
-                            >
-                                <source src={`https://stream.mux.com/${project.video.playbackId}.m3u8?rendition=1080p`} media="(min-width: 1024px)" />
-                                <source src={`https://stream.mux.com/${project.video.playbackId}.m3u8?rendition=720p`} media="(min-width: 768px)" />
-                                <source src={`https://stream.mux.com/${project.video.playbackId}.m3u8?rendition=480p`} />
-                            </video>
+                            />
+
+                            {/* Cover Media Overlay that zooms out and fades once video starts playing */}
+                            {posterUrl && (
+                                <div
+                                    className={`absolute inset-0 z-10 transition-all duration-1000 ease-out bg-cover bg-center ${
+                                        activeAndPlaying
+                                            ? "scale-110 opacity-0 pointer-events-none"
+                                            : "scale-100 opacity-100"
+                                    }`}
+                                    style={{ backgroundImage: `url(${posterUrl})` }}
+                                />
+                            )}
+
                             <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-black/20 pointer-events-none z-20" />
                         </Link>
                     );

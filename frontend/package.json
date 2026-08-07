@@ -9,9 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@mux/mux-video-react": "^0.31.2",
     "@sanity/image-url": "^2.1.1",
     "@tailwindcss/typography": "^0.5.20",
-    "hls.js": "^1.6.17",
     "lucide-react": "^1.17.0",
     "motion": "^12.40.0",
     "next": "16.2.6",

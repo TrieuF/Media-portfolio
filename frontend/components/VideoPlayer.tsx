@@ -1,43 +1,22 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { ProjectDocument, VideoItem } from "@/lib/sanity/sanity.types";
 import { motion } from "framer-motion";
-import Hls from "hls.js";
+import MuxVideo from "@mux/mux-video-react";
 
 export default function VideoPlayer({ project }: { project: ProjectDocument }) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
     const videoItem = project.mediaGallery?.find(
-        (item): item is VideoItem => (item as VideoItem).video !== undefined
+        (item): item is VideoItem => (item as VideoItem).video.playbackId !== undefined
     );
 
     const [isPlaying, setIsPlaying] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
     const [progress, setProgress] = useState(0);
     const [showCredits, setShowCredits] = useState(false);
-
-    // HLS.js integration for cross-browser Mux streaming
-    useEffect(() => {
-        const video = videoRef.current;
-        const playbackId = videoItem?.video?.playbackId;
-        if (!video || !playbackId) return;
-
-        const streamUrl = `https://stream.mux.com/${playbackId}.m3u8`;
-
-        if (video.canPlayType("application/vnd.apple.mpegurl")) {
-            video.src = streamUrl;
-        } else if (Hls.isSupported()) {
-            const hls = new Hls();
-            hls.loadSource(streamUrl);
-            hls.attachMedia(video);
-
-            return () => {
-                hls.destroy();
-            };
-        }
-    }, [videoItem]);
 
     if (!videoItem) return <div>No video found for this project.</div>;
 
@@ -74,16 +53,19 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                     delay: 0.1,
                 }}
             >
-                <video
+                <MuxVideo
                     ref={videoRef}
+                    playbackId={videoItem.video.playbackId}
                     className="w-full h-full object-contain cursor-pointer"
-                    onTimeUpdate={(e) => {
+                    onTimeUpdate={(e: React.SyntheticEvent<HTMLVideoElement>) => {
                         const v = e.currentTarget;
                         if (v.duration) {
                             setProgress((v.currentTime / v.duration) * 100);
                         }
                     }}
                     onClick={togglePlay}
+                    playsInline
+                    muted={isMuted}
                 />
 
                 {/* Controls */}
@@ -94,7 +76,7 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                         max="100"
                         value={progress}
                         onChange={(e) => {
-                            if (videoRef.current && videoRef.current.duration) {
+                            if (videoRef.current) {
                                 videoRef.current.currentTime = (Number(e.target.value) / 100) * videoRef.current.duration;
                                 setProgress(Number(e.target.value));
                             }
@@ -103,16 +85,16 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                     />
 
                     <div className="flex justify-center gap-6 text-sm uppercase tracking-widest">
-                        <button className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer" onClick={togglePlay}>
+                        <button className="opacity-70 hover:opacity-100 transition-opacity" onClick={togglePlay}>
                             {isPlaying ? "Pause" : "Play"}
                         </button>
-                        <button className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer" onClick={() => { if(videoRef.current) { videoRef.current.muted = !videoRef.current.muted; setIsMuted(videoRef.current.muted); } }}>
+                        <button className="opacity-70 hover:opacity-100 transition-opacity" onClick={() => { if(videoRef.current) { videoRef.current.muted = !videoRef.current.muted; setIsMuted(videoRef.current.muted); } }}>
                             {isMuted ? "Unmute" : "Mute"}
                         </button>
-                        <button className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer" onClick={() => setShowCredits(true)}>
+                        <button className="opacity-70 hover:opacity-100 transition-opacity" onClick={() => setShowCredits(true)}>
                             Credits
                         </button>
-                        <button className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer" onClick={() => !document.fullscreenElement ? containerRef.current?.requestFullscreen() : document.exitFullscreen()}>
+                        <button className="opacity-70 hover:opacity-100 transition-opacity" onClick={() => !document.fullscreenElement ? containerRef.current?.requestFullscreen() : document.exitFullscreen()}>
                             Fullscreen
                         </button>
                     </div>
@@ -125,7 +107,7 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                             <h2 className="text-2xl font-bold">{project.title}</h2>
                             <button
                                 onClick={() => setShowCredits(false)}
-                                className="underline opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
+                                className="underline opacity-70 hover:opacity-100 transition-opacity"
                             >
                                 Close
                             </button>
