@@ -20,7 +20,7 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
     const hasMoved = useRef(false);
     const scrollAccumulator = useRef(0);
 
-    const validProjects = projects.filter((p) => p.video.playbackId);
+    const validProjects = projects.filter((p) => p.video?.playbackId);
 
     const setVideoRef = useCallback((index: number, el: HTMLVideoElement | null) => {
         videoRefs.current[index] = el;
@@ -200,9 +200,9 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
                                 preload="auto"
                                 className="w-full h-full object-cover object-center brightness-[0.75] pointer-events-none"
                             >
-                                <source src={`https://stream.mux.com/${project.playbackId}.m3u8?rendition=1080p`} media="(min-width: 1024px)" />
-                                <source src={`https://stream.mux.com/${project.playbackId}.m3u8?rendition=720p`} media="(min-width: 768px)" />
-                                <source src={`https://stream.mux.com/${project.playbackId}.m3u8?rendition=480p`} />
+                                <source src={`https://stream.mux.com/${project.video.playbackId}.m3u8?rendition=1080p`} media="(min-width: 1024px)" />
+                                <source src={`https://stream.mux.com/${project.video.playbackId}.m3u8?rendition=720p`} media="(min-width: 768px)" />
+                                <source src={`https://stream.mux.com/${project.video.playbackId}.m3u8?rendition=480p`} />
                             </video>
                             <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-black/20 pointer-events-none z-20" />
                         </Link>

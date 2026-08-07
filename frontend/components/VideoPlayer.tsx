@@ -18,21 +18,17 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
     const [progress, setProgress] = useState(0);
     const [showCredits, setShowCredits] = useState(false);
 
-    const playbackId = videoItem?.video?.playbackId;
-
-    // HLS.js setup
+    // HLS.js integration for cross-browser Mux streaming
     useEffect(() => {
         const video = videoRef.current;
+        const playbackId = videoItem?.video?.playbackId;
         if (!video || !playbackId) return;
 
         const streamUrl = `https://stream.mux.com/${playbackId}.m3u8`;
 
-        // Native HLS support (Safari)
         if (video.canPlayType("application/vnd.apple.mpegurl")) {
             video.src = streamUrl;
-        }
-        // Hls.js support for Chrome, Firefox, Edge, etc.
-        else if (Hls.isSupported()) {
+        } else if (Hls.isSupported()) {
             const hls = new Hls();
             hls.loadSource(streamUrl);
             hls.attachMedia(video);
@@ -41,9 +37,9 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                 hls.destroy();
             };
         }
-    }, [playbackId]);
+    }, [videoItem]);
 
-    if (!videoItem || !playbackId) return <div>No video found for this project.</div>;
+    if (!videoItem) return <div>No video found for this project.</div>;
 
     const togglePlay = async () => {
         if (videoRef.current?.paused) {
@@ -87,8 +83,6 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                             setProgress((v.currentTime / v.duration) * 100);
                         }
                     }}
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
                     onClick={togglePlay}
                 />
 
@@ -109,16 +103,16 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                     />
 
                     <div className="flex justify-center gap-6 text-sm uppercase tracking-widest">
-                        <button className="opacity-70 hover:opacity-100 transition-opacity" onClick={togglePlay}>
+                        <button className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer" onClick={togglePlay}>
                             {isPlaying ? "Pause" : "Play"}
                         </button>
-                        <button className="opacity-70 hover:opacity-100 transition-opacity" onClick={() => { if(videoRef.current) { videoRef.current.muted = !videoRef.current.muted; setIsMuted(videoRef.current.muted); } }}>
+                        <button className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer" onClick={() => { if(videoRef.current) { videoRef.current.muted = !videoRef.current.muted; setIsMuted(videoRef.current.muted); } }}>
                             {isMuted ? "Unmute" : "Mute"}
                         </button>
-                        <button className="opacity-70 hover:opacity-100 transition-opacity" onClick={() => setShowCredits(true)}>
+                        <button className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer" onClick={() => setShowCredits(true)}>
                             Credits
                         </button>
-                        <button className="opacity-70 hover:opacity-100 transition-opacity" onClick={() => !document.fullscreenElement ? containerRef.current?.requestFullscreen() : document.exitFullscreen()}>
+                        <button className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer" onClick={() => !document.fullscreenElement ? containerRef.current?.requestFullscreen() : document.exitFullscreen()}>
                             Fullscreen
                         </button>
                     </div>
@@ -131,7 +125,7 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                             <h2 className="text-2xl font-bold">{project.title}</h2>
                             <button
                                 onClick={() => setShowCredits(false)}
-                                className="underline opacity-70 hover:opacity-100 transition-opacity"
+                                className="underline opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
                             >
                                 Close
                             </button>

@@ -2,8 +2,14 @@ import { type SanityDocument } from "next-sanity";
 import {SanityImageSource} from "@sanity/image-url";
 
 export interface SanityAssetReference {
-  _ref: string
-  _type: 'reference'
+  _ref: string;
+  _type: 'reference';
+  [key: string]: unknown;
+}
+
+export interface Slug {
+  _type: 'slug';
+  current: string;
 }
 
 export interface CreditItem {
@@ -13,14 +19,30 @@ export interface CreditItem {
   instagram?: string;
 }
 
+export interface CoverMedia {
+  _type: 'image';
+  asset?: SanityAssetReference;
+  alt?: string;
+  [key: string]: unknown;
+}
+
+export interface PhotoItem {
+  _type: 'image';
+  _key: string;
+  asset?: SanityAssetReference;
+  url?: string;
+  alt?: string;
+  aspectRatioPreference?: 'auto' | 'portrait' | 'landscape';
+  [key: string]: unknown;
+}
+
 export interface MuxVideoData {
-  _type: 'mux.video'
-  asset?: SanityAssetReference
-  playbackId?: string
-  status?: string
-  duration?: number
-  trackId?: string
-  trackStatus?: string
+  _type: 'mux.video';
+  asset?: SanityAssetReference;
+  playbackId?: string;
+  assetId?: string;
+  status?: string;
+  duration?: number;
   [key: string]: unknown;
 }
 
@@ -31,36 +53,16 @@ export interface VideoItem {
   video: MuxVideoData;
 }
 
-export interface PhotoItem {
-  _type: 'image';
-  _key: string;
-  asset?: SanityAssetReference;
-  url: string;
-  alt?: string;
-}
-
-// Define the union correctly
 export type GalleryItem = PhotoItem | VideoItem;
 
 export interface ProjectDocument extends SanityDocument {
   title: string;
-  slug?: {
-    current: string;
-    _type: 'slug';
-  };
-  photoid?: string;
-  playbackId?: string;
-  galleryLayout?: "video" | "photos";
+  slug: Slug;
+  galleryLayout: 'video' | 'photos';
   description?: string;
   credits?: CreditItem[];
-  coverMedia?: {
-    _type: 'image';
-    asset?: SanityAssetReference;
-    url?: string;
-    alt?: string;
-    [key: string]: unknown;
-  };
-  mediaGallery?: GalleryItem[];
+  coverMedia: CoverMedia;
+  mediaGallery: GalleryItem[];
 }
 
 export interface HeaderProps {
