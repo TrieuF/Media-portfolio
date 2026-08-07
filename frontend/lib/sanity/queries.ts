@@ -5,9 +5,10 @@ export const HIGHLIGHTVIDEO_QUERY = groq`
     "featuredProjects": featuredVideos[]-> {
       _id,
       title,
+      slug,
       "photoid": slug.current,
       "playbackId": mediaGallery[_type == "videoBlock"][0].video.asset->playbackId,
-      coverImage
+      coverMedia
     }
   }
 `
@@ -58,7 +59,6 @@ export const PHOTO_BY_SLUG_QUERY = groq`
         alt
       },
       _type == "videoBlock" => {
-        caption,
         "video": video.asset->{playbackId}
       }
     }
@@ -85,17 +85,17 @@ export const FILM_BY_SLUG_QUERY = groq`
     "mediaGallery": mediaGallery[]{
       _type == "image" => {
         ...,
-        alt
+        alt,
+        "url": asset->url
       },
       _type == "videoBlock" => {
         _type,
         _key,
-        caption,
-        "playbackId": video.asset->playbackId
+        title,
+        video
       }
     }
   }
 `
-
 
 

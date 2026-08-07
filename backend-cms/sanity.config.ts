@@ -27,7 +27,6 @@ export default defineConfig({
               .id('siteSettings')
               .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
 
-
             S.listItem()
               .title('Highlighted Videos')
               .id('highlightedVideos')
@@ -37,7 +36,9 @@ export default defineConfig({
             S.documentTypeListItem('project').title('Projects'),
           ]),
     }),
-    muxInput(),
+    muxInput({
+      video_quality: 'basic',
+    }),
   ],
 
   schema: {

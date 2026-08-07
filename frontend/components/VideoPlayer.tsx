@@ -9,7 +9,7 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const videoItem = project.mediaGallery?.find(
-        (item): item is VideoItem => (item as VideoItem).playbackId !== undefined
+        (item): item is VideoItem => (item as VideoItem).video !== undefined
     );
 
     const [isPlaying, setIsPlaying] = useState(false);
@@ -54,7 +54,7 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
             >
                 <video
                     ref={videoRef}
-                    src={`https://stream.mux.com/${videoItem.playbackId}.m3u8`}
+                    src={`https://stream.mux.com/${videoItem.video.playbackId}.m3u8`}
                     className="w-full h-full object-contain"
                     onTimeUpdate={(e) => {
                         const v = e.currentTarget;

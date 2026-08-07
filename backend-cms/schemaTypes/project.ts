@@ -37,7 +37,7 @@ export default defineType({
         ],
         layout: 'radio',
       },
-      initialValue: 'video', // Defaults to video style
+      validation: (Rule) => Rule.required(),
     }),
     // --- TEXT & CREDITS ---
     defineField({
@@ -113,22 +113,16 @@ export default defineType({
           title: 'Mux Video',
           fields: [
             defineField({
+              name: 'title',
+              type: 'string',
+              title: 'Title',
+            }),
+            defineField({
               name: 'video',
               title: 'Mux Video Asset',
               type: 'mux.video', // Handled by sanity-plugin-mux-input
             }),
-            defineField({
-              name: 'caption',
-              title: 'Caption / Subtitle (Optional)',
-              type: 'string',
-            }),
           ],
-          preview: {
-            select: {title: 'caption'},
-            prepare(selection: Record<string, any>) {
-              return {title: selection.title || 'Mux Video Asset'}
-            },
-          },
         },
       ],
     }),
@@ -138,13 +132,6 @@ export default defineType({
       title: 'title',
       media: 'coverMedia',
       subtitle: 'galleryLayout',
-    },
-    prepare({title, media, subtitle}) {
-      return {
-        title,
-        media,
-        subtitle: `Layout: ${subtitle ? subtitle.toUpperCase() : 'STACK'}`,
-      }
     },
   },
 })
