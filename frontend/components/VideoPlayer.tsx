@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ProjectDocument, VideoItem } from "@/lib/sanity/sanity.types";
 import { motion } from "framer-motion";
+import Hls from "hls.js";
 
 export default function VideoPlayer({ project }: { project: ProjectDocument }) {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -17,9 +18,32 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
     const [progress, setProgress] = useState(0);
     const [showCredits, setShowCredits] = useState(false);
 
-    if (!videoItem) return <div>No video found for this project.</div>;
+    const playbackId = videoItem?.video?.playbackId;
 
-    console.log(videoItem);
+    // HLS.js setup
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video || !playbackId) return;
+
+        const streamUrl = `https://stream.mux.com/${playbackId}.m3u8`;
+
+        // Native HLS support (Safari)
+        if (video.canPlayType("application/vnd.apple.mpegurl")) {
+            video.src = streamUrl;
+        }
+        // Hls.js support for Chrome, Firefox, Edge, etc.
+        else if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(streamUrl);
+            hls.attachMedia(video);
+
+            return () => {
+                hls.destroy();
+            };
+        }
+    }, [playbackId]);
+
+    if (!videoItem || !playbackId) return <div>No video found for this project.</div>;
 
     const togglePlay = async () => {
         if (videoRef.current?.paused) {
@@ -56,12 +80,15 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
             >
                 <video
                     ref={videoRef}
-                    src={`https://stream.mux.com/${videoItem.video.playbackId}.m3u8`}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain cursor-pointer"
                     onTimeUpdate={(e) => {
                         const v = e.currentTarget;
-                        setProgress((v.currentTime / v.duration) * 100);
+                        if (v.duration) {
+                            setProgress((v.currentTime / v.duration) * 100);
+                        }
                     }}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
                     onClick={togglePlay}
                 />
 
@@ -73,7 +100,7 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                         max="100"
                         value={progress}
                         onChange={(e) => {
-                            if (videoRef.current) {
+                            if (videoRef.current && videoRef.current.duration) {
                                 videoRef.current.currentTime = (Number(e.target.value) / 100) * videoRef.current.duration;
                                 setProgress(Number(e.target.value));
                             }
