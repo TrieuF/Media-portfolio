@@ -90,8 +90,8 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                         tabIndex={-1}
                     />
 
-                    {/* Custom Control Bar */}
-                    <div className="absolute bottom-15 left-1/2 -translate-x-1/2 w-112.5 p-4 bg-black/50 backdrop-blur-md rounded-full z-20 border border-white/10 shadow-2xl">
+                    {/* Responsive Custom Control Bar */}
+                    <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 w-[90%] sm:w-[450px] max-w-lg p-3 sm:p-4 bg-black/50 backdrop-blur-md rounded-2xl sm:rounded-full z-20 border border-white/10 shadow-2xl">
 
                         {/* Quality Popup Menu */}
                         {showQualityMenu && (
@@ -131,9 +131,9 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                         />
 
                         {/* Control Buttons */}
-                        <div className="flex justify-center items-center gap-6 text-sm uppercase tracking-widest">
+                        <div className="flex justify-between sm:justify-center items-center gap-4 sm:gap-6 text-xs sm:text-sm uppercase tracking-widest px-1 sm:px-0">
                             <MediaPlayButton
-                                className="w-8 h-8 opacity-70 hover:opacity-100 transition-opacity"
+                                className="w-7 h-7 sm:w-8 sm:h-8 opacity-70 hover:opacity-100 transition-opacity"
                                 style={{
                                     "--media-control-background": "transparent",
                                     "--media-control-hover-background": "transparent"
@@ -141,7 +141,7 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                             />
 
                             <MediaMuteButton
-                                className="w-8 h-8 opacity-70 hover:opacity-100 transition-opacity"
+                                className="w-7 h-7 sm:w-8 sm:h-8 opacity-70 hover:opacity-100 transition-opacity"
                                 style={{
                                     "--media-control-background": "transparent",
                                     "--media-control-hover-background": "transparent"
@@ -149,21 +149,21 @@ export default function VideoPlayer({ project }: { project: ProjectDocument }) {
                             />
 
                             <button
-                                className="opacity-70 hover:opacity-100 transition-opacity"
+                                className="opacity-70 hover:opacity-100 transition-opacity truncate"
                                 onClick={() => setShowQualityMenu(!showQualityMenu)}
                             >
                                 {selectedQuality}
                             </button>
 
                             <button
-                                className="opacity-70 hover:opacity-100 transition-opacity"
+                                className="opacity-70 hover:opacity-100 transition-opacity truncate"
                                 onClick={() => setShowCredits(true)}
                             >
                                 Credits
                             </button>
 
                             <MediaFullscreenButton
-                                className="w-8 h-8 opacity-70 hover:opacity-100 transition-opacity"
+                                className="w-7 h-7 sm:w-8 sm:h-8 opacity-70 hover:opacity-100 transition-opacity"
                                 style={{
                                     "--media-control-background": "transparent",
                                     "--media-control-hover-background": "transparent"
