@@ -206,6 +206,7 @@ export default function HighlightedVideos({ projects }: { projects: ProjectDocum
                                 playsInline
                                 controls={false}
                                 preload="auto"
+                                tabIndex={-1}
                                 className="w-full h-full object-cover object-center brightness-[0.75] pointer-events-none"
                             />
 
